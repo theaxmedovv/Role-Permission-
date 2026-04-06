@@ -8,7 +8,7 @@ Bu loyiha Laravel framework yordamida role va permission boshqarish tizimini ama
 - **PHP** 8.1+
 - **Spatie Laravel Permission** paket
 - **Bootstrap 5** (UI uchun)
-- **SQLite/MySQL** (ma'lumotlar bazasi)
+- **MySQL** (ma'lumotlar bazasi)
 
 ## O'rnatish
 
