@@ -14,6 +14,9 @@
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body">
+                        @if($post->image)
+                            <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" class="card-img-top">
+                        @endif
                         <h5 class="card-title">{{ $post->title }}</h5>
                         <p class="card-text">{{ Str::limit($post->content, 100) }}</p>
                         <p class="text-muted">By {{ $post->user->name }}</p>

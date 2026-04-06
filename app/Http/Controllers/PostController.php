@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -33,16 +35,19 @@ class PostController extends Controller
     {
         Gate::authorize('create posts');
 
-        $request->validate([
+        $data = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Post::create([
-            'title' => $request->title,
-            'content' => $request->content,
-            'user_id' => auth()->id(),
-        ]);
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('posts', 'public');
+        }
+
+        $data['user_id'] = auth()->id();
+
+        Post::create($data);
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
     }
@@ -75,12 +80,21 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
         Gate::authorize('edit posts');
 
-        $request->validate([
+        $data = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $post->update($request->only(['title', 'content']));
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($post->image) {
+                \Storage::disk('public')->delete($post->image);
+            }
+            $data['image'] = $request->file('image')->store('posts', 'public');
+        }
+
+        $post->update($data);
 
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }
@@ -97,4 +111,5 @@ class PostController extends Controller
 
         return redirect()->route('posts.index')->with('success', 'Post deleted successfully.');
     }
+
 }
